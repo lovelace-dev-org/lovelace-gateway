@@ -20,7 +20,7 @@ class Command(BaseCommand):
             students = json.load(registry)
 
         with open(options["hostfile"]) as hostfile:
-            hosts = json.load(hostfile)
+            hosts = [host.strip() for host in hostfile.readlines() if host]
 
         for i, student in enumerate(students):
             record = fm.ForwardMapping(
