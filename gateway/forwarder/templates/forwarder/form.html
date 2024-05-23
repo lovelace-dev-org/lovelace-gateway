@@ -1,0 +1,49 @@
+{% extends 'forwarder/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page-content %}
+
+  <form id="signup-form"
+    class="main-form"
+    method="POST"
+    enctype="multipart/form-data"
+    action="{{ submit_url }}">
+
+        <div class="form-disclaimer">
+          {{ disclaimer }}
+        </div>
+        {% csrf_token %}
+
+        {% for field in form_object.hidden_fields %}
+            {{ field }}
+        {% endfor %}
+
+        <table class="edit-form-table">
+          <tbody>
+            {% for field in form_object.visible_fields %}
+              <tr>
+                <td colspan="2">{{ field.errors }}</td>
+              </tr>
+              <tr>
+                <td>
+                    {% if field.field.required %}
+                        <b>{{ field.label_tag }}</b>
+                    {% else %}
+                        {{ field.label_tag }}
+                    {% endif %}
+                </td>
+                <td>{{ field }}</td>
+              </tr>
+            {% endfor %}
+          <tbody>
+        </table>
+        <input type="submit" name="submit" value="{% trans 'Submit' %}"></input>
+  </form>
+
+  <script>
+    $("#signup-form").submit(submit_message)
+  </script>
+
+{% endblock %}
+

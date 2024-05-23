@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    {% load static %}
+    {% load i18n %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700,700italic%26subset=latin,latin-ext">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+    <link rel="icon" href="{% static 'forwarder/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'forwarder/style.css' %}">
+    <link rel="stylesheet" href="{% static 'forwarder/medium-screens.css' %}" media="(max-width: 1912px)">
+    <link rel="stylesheet" href="{% static 'forwarder/small-screens.css' %}" media="(max-width: 1759px)">
+    <link rel="stylesheet" href="{% static 'forwarder/syntax.css' %}">
+    <link rel="stylesheet" href="{% static 'forwarder/latofonts.css' %}">
+
+    <script src="{% static 'forwarder/jquery-3.6.4.min.js' %}"></script>
+    <script src="{% static 'forwarder/script.js' %}"></script>
+    {% block extra-static %}{% endblock %}
+    
+    <title>{% block page-title %}{% endblock %}</title>
+  </head>
+  <body>
+    {% if not request.session.cookies_accepted %}
+      <div id="cookie-law-message">
+        <div class="cookie-law-container">
+          <p>{% url 'forwarder:terms' as terms_url %}
+            {% blocktrans %}
+              This site uses cookies to remember which host you will be forwarded to. This site does
+              not use any tracking cookies.
+            {% endblocktrans %}
+          </p>
+          <button onclick="accept_cookies();">{% trans 'Accept' %}</button>
+        </div>
+      </div>
+    {% endif %}
+    <div id="container">
+      <header class="top-header">
+        <div id="container-top">
+          <div class="page-title">
+            <h1>Lovelace</h1>
+          </div>
+          <div class="user-actions">
+          </div>{% comment %}login box{% endcomment %}
+        </div>
+      </header>
+      
+      {% block top-nav-bar %}
+      <nav class="breadcrumb">
+        <div class="top-nav-container">
+        <ul>
+        </ul>
+        <div class="right-side">
+          <div class="vertical-separator"></div>
+          {# https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#set-language-redirect-view #}
+          <form action="{% url 'set_language' %}" method="post" class="language-picker">
+            {% csrf_token %}            
+            <input name="next" type="hidden" value="{{ redirect_to }}">
+            <select name="language" onchange="this.form.submit();">
+              {% get_current_language as LANGUAGE_CODE %}
+              {% get_available_languages as LANGUAGES %}
+              {% get_language_info_list for LANGUAGES as languages %}
+              {% for language in languages %}
+                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %}
+                        selected="selected"{% endif %}>
+                  {{ language.name_local }} ({{ language.code }})
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        </div>
+      </nav>
+      {% endblock %}
+
+      <section class="content">
+        {% block page-content %}
+        {% endblock %}
+      </section>
+
+      <footer>
+        <div class="column0">
+        </div>
+        <div class="column1">
+          <p>Powered by Python, Django and jQuery.</p>
+          {# <p><a href="{% url 'terms' %}">{% trans 'Terms and Conditions' %}</a></p>#}
+        </div>
+      </footer>
+    </div>{# end container #}
+  </body>
+</html>
